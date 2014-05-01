@@ -69,7 +69,7 @@ def is_number(s):
 
 		
 def main(argv):
-	if len(sys.argv) < 2 :
+	if len(sys.argv) < 3 :
 		sys.stderr.write('Usage: sys.argv[0] imdb/duckduckgo folder \n')
 		sys.exit(1)
 		
