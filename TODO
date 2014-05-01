@@ -2,3 +2,5 @@ Need to use the DuckDuckgo api "https://duckduckgo.com/api"
 
 This way I'll help the DuckDuckgo popularity and get a nice api for search,
 as opposed to the not so free alternative for google :(
+-Parse the DuckDuckGo result by myself :( the answers api from duckduckgo is useless... :
+ a link for example: https://api.duckduckgo.com/d.js?q=Superman%2BVs%2BThe%2BElite%2B2012%2BIMDB&l=us-en&p=1&s=0

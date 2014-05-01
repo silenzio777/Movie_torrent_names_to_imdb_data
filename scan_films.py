@@ -4,24 +4,6 @@ import urllib2
 import re
 import time #sleep
 
-def movie_name_to_imdb_page_from_google(query) :
-
-	user_agent = 'Mozilla/4.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
-
-	url = "https://www.google.com/search?hl=en&safe=off&q=Monkey&q=%s" %(query)
-	headers={'User-Agent':user_agent,} 
-	request=urllib2.Request(url,None,headers) 
-	response = urllib2.urlopen(request)
-	
-	page_source = response.read()
-	imdb_url_pos = page_source.find("http://www.imdb.com/title/")
-	if (imdb_url_pos != -1) :
-		imdb_url = page_source[imdb_url_pos:imdb_url_pos+36]
-	else :
-		return None
-		
-	print imdb_url
-	return imdb_url
 	
 def parse_imdb_page(url) :
 	
@@ -84,47 +66,61 @@ def is_number(s):
         return True
     except ValueError:
         return False
-	
-if len(sys.argv) < 2 :
-	sys.stderr.write('Usage: sys.argv[0] ')
-	sys.exit(1)
 
-
-movie_dict = {}	
-movie_search_path = sys.argv[1]
-
-if not os.path.exists(movie_search_path) :
-	sys.stderr.write('Error sys.argv[1] doesn\'t exist ')
-
-for filename in os.listdir(movie_search_path): 
-	print "Raw filename :: " + filename
-	name_parts = filename.split('.')
-	i = 0
-	movie_year = 0
-	for part in name_parts :
-		if not is_number(part) :
-			i+=1
-		elif(float(part) < 1990):
-			i+=1
-		else :
-			movie_year = part
-			break
-	if (movie_year == 0) :
-		pass 
+		
+def main(argv):
+	if len(sys.argv) < 2 :
+		sys.stderr.write('Usage: sys.argv[0] imdb/duckduckgo folder \n')
+		sys.exit(1)
+		
+	if(sys.argv[1] == "duckduckgo"):
+		import duckduckgo
+		from scan_films_duckduckgo import movie_name_to_imdb_page
+	elif(sys.argv[1] == "google"):
+		from scan_films_google import movie_name_to_imdb_page
 	else :
-		movie_name = " ".join(name_parts[0:i])
-		
-		movie_imdb_query = "+".join(name_parts[0:i]) +"+" + str(movie_year) + "+IMDB"
-		imdb_movie_url = movie_name_to_imdb_page_from_google(movie_imdb_query)
-		parse_imdb_page (imdb_movie_url)
-		
-		if movie_dict.has_key(movie_name) :
-			print "Duplicate movie name ::: %s " % movie_name
-		
-		movie_dict[movie_name]  = movie_year
-		print "Movie name : "  + movie_name + ' , Production Year : ' + str(movie_year)
-		time.sleep(10)
+		exit (-1)
+	
+	
+	movie_dict = {}	
+	movie_search_path = sys.argv[2]
+
+	if not os.path.exists(movie_search_path) :
+		sys.stderr.write('Error sys.argv[1] doesn\'t exist ')
+
+	for filename in os.listdir(movie_search_path): 
+		print "Raw filename :: " + filename
+		name_parts = filename.split('.')
+		i = 0
+		movie_year = 0
+		for part in name_parts :
+			if not is_number(part) :
+				i+=1
+			elif(float(part) < 1990):
+				i+=1
+			else :
+				movie_year = part
+				break
+		if (movie_year == 0) :
+			pass 
+		else :
+			movie_name = " ".join(name_parts[0:i])
+			
+			movie_imdb_query = "+".join(name_parts[0:i]) +"+" + str(movie_year) + "+IMDB"
+			
+			imdb_movie_url = movie_name_to_imdb_page(movie_imdb_query)
+
+				
+			parse_imdb_page (imdb_movie_url)
+			
+			if movie_dict.has_key(movie_name) :
+				print "Duplicate movie name ::: %s " % movie_name
+			
+			movie_dict[movie_name]  = movie_year
+			print "Movie name : "  + movie_name + ' , Production Year : ' + str(movie_year)
+			time.sleep(10)
 
 
-
+if __name__ == "__main__":
+   main(sys.argv[1:])
 
